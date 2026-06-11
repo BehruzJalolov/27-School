@@ -190,7 +190,7 @@ class PhoneAuthController extends Controller
     private function redirectPathFor(User $user): string
     {
         if ($user->hasAnyRole([UserRole::Developer->value, UserRole::Admin->value, UserRole::Teacher->value])) {
-            return route('admin.admin.dashboard', absolute: false);
+            return route('admin.dashboard', absolute: false);
         }
 
         return route('index', absolute: false);

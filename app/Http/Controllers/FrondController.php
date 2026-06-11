@@ -85,10 +85,12 @@ public function index()
     $posts = Post::query();
 
     if ($query) {
-        $posts = $posts->where('title_uz', 'like', "%{$query}%")
-                       ->orWhere('title_uz', 'like', "%{$query}%")
-                        ->orWhere('body_uz', 'like', "%{$query}%")
-                         ->orWhere('body_ru', 'like', "%{$query}%"); // content - agar matn bor bo'lsa
+        $posts->where(function ($q) use ($query) {
+            $q->where('title_uz', 'like', "%{$query}%")
+                ->orWhere('title_ru', 'like', "%{$query}%")
+                ->orWhere('body_uz', 'like', "%{$query}%")
+                ->orWhere('body_ru', 'like', "%{$query}%");
+        });
     }
 
 
@@ -256,7 +258,14 @@ public function usefulResourceDetail($id)
 
     public function SendEmail(Request $request) {
 
-        $data = $request->all();
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'mavzu' => 'required|string|max:255',
+            'message' => 'required|string|max:2000',
+        ]);
+
         Mail::to('behruzjalolov13@gmail.com')->send(new Message($data));
 
         return redirect()->route('connect')->with('success', 'Email muvaffaqiyatli yuborildi!');

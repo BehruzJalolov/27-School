@@ -68,13 +68,13 @@ class CategoryTop extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name_uz' => 'required|string|max:255',
-            'name_ru' => 'required|string',
+            'name_ru' => 'required|string|max:255',
             'url' => 'required|string|max:255',
         ]);
-        $category = CategoryTopp::find($id);
-        $category->update($request->all());
+        $category = CategoryTopp::findOrFail($id);
+        $category->update($validated);
         return redirect()->route('admin.CategoryTop.index')->with('success', 'Post yangilandi!');
     }
 

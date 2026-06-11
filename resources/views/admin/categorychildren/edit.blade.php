@@ -20,15 +20,19 @@
                         <label for="name_ru" class="form-label">Name (ru)</label>
                         <input type="text" class="form-control" id="name_ru" placeholder="name..." name="name_ru" value="{{ $category->name_ru }}">
                     </div>
-                     <div class="mb-3">
+                    <div class="mb-3">
                         <label for="category_id" class="form-label">Category</label>
                         <select name="category_id" class="form-control" id="category_id">
-                            @foreach($Category as $category)
-                                <option value="{{ $category->id }}">
-                                    {{ $category->name_uz }}
+                            @foreach($Category as $parentCategory)
+                                <option value="{{ $parentCategory->id }}" @selected($parentCategory->id == $category->category_id)>
+                                    {{ $parentCategory->name_uz }}
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="url" class="form-label">Url</label>
+                        <input type="text" class="form-control" id="url" placeholder="url..." name="url" value="{{ $category->url }}">
                     </div>
 
                     <div class="input-group-append">

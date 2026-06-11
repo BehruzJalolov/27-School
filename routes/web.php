@@ -74,34 +74,39 @@ Route::post('ckeditor/upload', [\App\Http\Controllers\CKEditorController::class,
         ->name('admin.ckeditor.upload');
 
 
-Route::prefix('admin')->middleware(['auth', 'active', 'role:developer|admin|teacher'])->name('admin.')->group(function () {
+Route::prefix('admin')->middleware(['auth', 'active', 'permission:view admin panel'])->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
-    })->name('admin.dashboard');
+    })->name('dashboard');
 
     Route::middleware('permission:manage users')->group(function () {
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
         Route::patch('users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserController::class, 'toggleActive'])
             ->name('users.toggle-active');
     });
-    Route::resource('category', CategoryController::class);
-    Route::resource('employee', EmployeeController::class);
-    Route::resource('position', PositionController::class);
-    Route::resource('empCategory', empCategoryController::class);
-    Route::resource('CategoryTop', \App\Http\Controllers\CategoryTop::class);
-    Route::resource('posts', \App\Http\Controllers\PostsController::class);
-    Route::resource('statictik', \App\Http\Controllers\StatictikController::class);
-    Route::resource('gallery', GalleryController::class);
-    Route::resource('infografika', infoGrafikaController::class);
-    Route::resource('smenatype', \App\Http\Controllers\SmenaTypeController::class);
-    Route::resource('schedule', \App\Http\Controllers\SchudeliController::class);
-    Route::resource('lesson', \App\Http\Controllers\LessonController::class);
-    Route::resource('usefulResource', \App\Http\Controllers\UserfulController::class);
-    Route::resource('HomePageImageTag', \App\Http\Controllers\HomePageImageTagController::class);
+    Route::middleware('permission:manage content')->group(function () {
+        Route::resource('category', CategoryController::class);
+        Route::resource('employee', EmployeeController::class);
+        Route::resource('position', PositionController::class);
+        Route::resource('empCategory', empCategoryController::class);
+        Route::resource('CategoryTop', \App\Http\Controllers\CategoryTop::class);
+        Route::resource('posts', \App\Http\Controllers\PostsController::class);
+        Route::resource('statictik', \App\Http\Controllers\StatictikController::class);
+        Route::resource('infografika', infoGrafikaController::class);
+        Route::resource('usefulResource', \App\Http\Controllers\UserfulController::class);
+        Route::resource('HomePageImageTag', \App\Http\Controllers\HomePageImageTagController::class);
+        Route::resource('categorychildren', \App\Http\Controllers\ChildrenCategoryController::class);
+    });
 
+    Route::middleware('permission:manage gallery')->group(function () {
+        Route::resource('gallery', GalleryController::class);
+    });
 
-
-    Route::resource('categorychildren', \App\Http\Controllers\ChildrenCategoryController::class);
+    Route::middleware('permission:manage schedule')->group(function () {
+        Route::resource('smenatype', \App\Http\Controllers\SmenaTypeController::class);
+        Route::resource('schedule', \App\Http\Controllers\SchudeliController::class);
+        Route::resource('lesson', \App\Http\Controllers\LessonController::class);
+    });
 
 
 

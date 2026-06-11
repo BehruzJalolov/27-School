@@ -69,12 +69,12 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name_uz' => 'required|string|max:255',
-            'name_ru' => 'required|string',
+            'name_ru' => 'required|string|max:255',
         ]);
-        $category = Category::find($id);
-        $category->update($request->all());
+        $category = Category::findOrFail($id);
+        $category->update($validated);
         return redirect()->route('admin.category.index')->with('success', 'Post yangilandi!');
     }
 

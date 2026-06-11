@@ -98,7 +98,7 @@ class OneIdAuthController extends Controller
         request()->session()->regenerate();
 
         if ($user->hasAnyRole([UserRole::Developer->value, UserRole::Admin->value, UserRole::Teacher->value])) {
-            return redirect()->intended(route('admin.admin.dashboard', absolute: false));
+            return redirect()->intended(route('admin.dashboard', absolute: false));
         }
 
         return redirect()->intended(route('index', absolute: false));

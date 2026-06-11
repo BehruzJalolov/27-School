@@ -67,12 +67,14 @@ class ChildrenCategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-         $request->validate([
+        $validated = $request->validate([
             'name_uz' => 'required|string|max:255',
-            'name_ru' => 'required|string',
+            'name_ru' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'url' => 'required|string|max:255',
         ]);
-        $category = Categorychildren::find($id);
-        $category->update($request->all());
+        $category = Categorychildren::findOrFail($id);
+        $category->update($validated);
         return redirect()->route('admin.categorychildren.index')->with('success', 'Post yangilandi!');
     }
 
