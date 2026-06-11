@@ -29,14 +29,17 @@ Route::get('/lang/{locale}', function ($locale) {
 
 
 
+
 Route::get('schooltack', [FrondController::class,'schoolTack'])->name('schooltack');
 Route::get('leadershep', [FrondController::class,'leaderShep'])->name('leaderShep');
 Route::get('teachers', [FrondController::class,'teachers'])->name('teachers');
 Route::get('rekvizit', [FrondController::class,'rekvizit'])->name('rekvizit');
 Route::get('education', [FrondController::class,'education'])->name('education');
+Route::get('/newsDetail/{id}', [FrondController::class, 'newsDetail'])->name('newsDetail');
 Route::get('/educationDetail/{id}', [FrondController::class, 'educationDetail'])->name('educationDetail');
 Route::get('usefulresurs', [FrondController::class,'usefulresurs'])->name('usefulresurs');
-Route::get('schoolNews', [FrondController::class,'schoolNews'])->name('schoolNews');
+Route::get('/schoolNews',[FrondController::class,'schoolNews'])->name('schoolNews');
+Route::get('/education/category/{category}', [FrondController::class, 'educationByCategory'])->name('education.category');
 Route::get('Gallery', [FrondController::class,'Gallery'])->name('Gallery');
 Route::get('infoGrafika', [FrondController::class,'infoGrafika'])->name('infoGrafika');
 Route::get('connect', [FrondController::class,'connect'])->name('connect');
@@ -46,29 +49,41 @@ Route::get('/', [FrondController::class, 'index'])->name('index');
 Route::get('/teachers/search', [EmployeeController::class, 'search'])->name('teachers.search');
 Route::get('/education/search', [FrondController::class, 'educationSearch'])->name('education.search');
 Route::get('education/connect', [FrondController::class, 'connect'])->name('education.connect');
+// web.php
+
+
+
 
 Route::get('/search-posts', [FrondController::class, 'searchPosts'])->name('search.posts');
 
-Route::get('/category-tack', [FrondController::class, 'schoolTack'])->name('school.tack');
-
-
-Route::get('/education/category/{category}', [FrondController::class, 'educationByCategory'])->name('education.category');
 
 
 
 
 
 
-Route::get('usefulresoursedetail/{id}',[FrondController::class, 'usefulresoursedetail'])->name('usefulresoursedetail');
 
 
-Route::post('ckeditor/upload', [\App\Http\Controllers\CKEditorController::class, 'upload'])->name('admin.ckeditor.upload');
+
+Route::get('/useful-resources/{resource}', [FrondController::class, 'usefulResourceDetail'])
+    ->name('useful-resources.detail');
 
 
-Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
+Route::post('ckeditor/upload', [\App\Http\Controllers\CKEditorController::class, 'upload'])
+        ->middleware(['auth', 'active', 'permission:manage content'])
+        ->name('admin.ckeditor.upload');
+
+
+Route::prefix('admin')->middleware(['auth', 'active', 'role:developer|admin|teacher'])->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
-    })->middleware(['auth', 'verified'])->name('admin.dashboard');
+    })->name('admin.dashboard');
+
+    Route::middleware('permission:manage users')->group(function () {
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+        Route::patch('users/{user}/toggle-active', [\App\Http\Controllers\Admin\UserController::class, 'toggleActive'])
+            ->name('users.toggle-active');
+    });
     Route::resource('category', CategoryController::class);
     Route::resource('employee', EmployeeController::class);
     Route::resource('position', PositionController::class);
@@ -83,7 +98,7 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::resource('lesson', \App\Http\Controllers\LessonController::class);
     Route::resource('usefulResource', \App\Http\Controllers\UserfulController::class);
     Route::resource('HomePageImageTag', \App\Http\Controllers\HomePageImageTagController::class);
-   
+
 
 
     Route::resource('categorychildren', \App\Http\Controllers\ChildrenCategoryController::class);

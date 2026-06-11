@@ -35,4 +35,28 @@ return [
         ],
     ],
 
+    'sms' => [
+        'driver' => env('SMS_DRIVER', 'log'),
+    ],
+
+    'eskiz' => [
+        'base_url' => env('ESKIZ_BASE_URL', 'https://notify.eskiz.uz/api'),
+        'email' => env('ESKIZ_EMAIL'),
+        'password' => env('ESKIZ_PASSWORD'),
+        'from' => env('ESKIZ_FROM', '4546'),
+    ],
+
+    'oneid' => [
+        'base_url' => env('ONEID_BASE_URL', 'https://sso.egov.uz'),
+        'client_id' => env('ONEID_CLIENT_ID'),
+        'client_secret' => env('ONEID_CLIENT_SECRET'),
+        'scope' => env('ONEID_SCOPE', 'myportal'),
+        'redirect_uri' => env('ONEID_REDIRECT_URI'),
+        'endpoints' => [
+            'authorization' => env('ONEID_AUTH_ENDPOINT', '/sso/oauth/Authorization.do'),
+            'token' => env('ONEID_TOKEN_ENDPOINT', '/sso/oauth/Authorization.do'),
+            'user_info' => env('ONEID_USER_INFO_ENDPOINT', '/sso/oauth/Authorization.do'),
+        ],
+    ],
+
 ];

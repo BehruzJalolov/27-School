@@ -120,6 +120,14 @@
                       <div class="text-truncate" data-i18n="Layouts">HomePageImageTag</div>
                   </a>
               </li>
+              @can('manage users')
+              <li class="menu-item">
+                  <a href="{{ route('admin.users.index') }}" class="menu-link">
+                      <i class="menu-icon tf-icons bx bx-user"></i>
+                      <div class="text-truncate">Foydalanuvchilar</div>
+                  </a>
+              </li>
+              @endcan
                 
 
 
