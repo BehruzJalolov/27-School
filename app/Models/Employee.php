@@ -11,10 +11,10 @@ class Employee extends Model
         return $this->belongsTo(Position::class);
     }
     public function category() {
-        return $this->belongsTo(empCategory::class);
+        return $this->belongsTo(EmpCategory::class);
     }
     public function schudel() {
-        return $this->belongsTo(Schudeli::class);
+        return $this->belongsTo(Schedule::class);
     }
     public function education()
 {

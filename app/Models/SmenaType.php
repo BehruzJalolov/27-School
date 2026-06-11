@@ -8,7 +8,7 @@ class SmenaType extends Model
 {
     protected $guarded = [];
     public function schedule() {
-        return $this->hasMany(Schudeli::class);
+        return $this->hasMany(Schedule::class);
     }
 
 }

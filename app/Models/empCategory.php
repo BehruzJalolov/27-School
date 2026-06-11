@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class empCategory extends Model
+class EmpCategory extends Model
 {
+    protected $table = 'emp_categories';
     protected $guarded = [];
     
     public function employee() {

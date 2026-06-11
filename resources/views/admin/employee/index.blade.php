@@ -63,10 +63,8 @@
 
 
                                     <td>
-
-                                        <img src="/admin/images/{{ $employe->image }}" alt="" style="width: 60px; height: 60px;">
-
-                                    </td >
+                                        <img src="{{ asset('storage/employees/' . $employe->image) }}" alt="" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;">
+                                    </td>
                                     <td>{{ $employe->email }}</td>
                                     <td>{{ $employe->phone }}</td>
                                     <td>{{ $employe->work_time }}</td>
@@ -87,6 +85,10 @@
 
                             </tbody>
                         </table>
+                        
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $employees->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
             </div>

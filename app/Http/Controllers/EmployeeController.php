@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\empCategory;
+use App\Models\EmpCategory;
 use App\Models\Employee;
 use App\Models\Position;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -14,10 +17,8 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-         $empCategories = empCategory::all();
-         $positions = Position::all();
-         $employees = Employee::all();
-         return view('admin.employee.index',compact('employees','positions','empCategories'));
+         $employees = Employee::with(['category', 'position'])->paginate(15);
+         return view('admin.employee.index',compact('employees'));
     }
 
     /**
@@ -25,40 +26,30 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        $employees = Employee::all();
-        $empCategories = empCategory::all();
+        $empCategories = EmpCategory::all();
         $positions = Position::all();
-        return view('admin.employee.create',compact('positions','empCategories','employees'));
+        return view('admin.employee.create',compact('positions','empCategories'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request)
     {
-        $requestData = $request->validate([
-            'name_uz' => 'required',
-            'name_ru' => 'required',
-            'phone'  => 'required',
-            'email'  => 'required',
-            'work_time'  => 'required',
-            'category_id'  => 'required',
-            'position_id'  => 'required',
-        ]);
+        $requestData = $request->validated();
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $imageName = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('admin/images/'), $imageName);
+            $file->storeAs('public/employees', $imageName);
             $requestData['image'] = $imageName;
-        }else {
-            $requestData['image'] = 'default.jpg'; // mavjud bo'lgan default rasm nomi
+        } else {
+            $requestData['image'] = 'default.jpg';
         }
 
         Employee::create($requestData);
 
-        return redirect()->route('admin.employee.index');
-
+        return redirect()->route('admin.employee.index')->with('success', 'Employee created successfully!');
     }
 
     /**
@@ -66,10 +57,8 @@ class EmployeeController extends Controller
      */
   public function show($id)
 {
-     $empCategories = empCategory::all();
-    $positions = Position::all();
-    $employee = Employee::findOrFail($id);
-    return view('admin.employee.show', compact('employee','positions','empCategories'));
+    $employee = Employee::with(['category', 'position'])->findOrFail($id);
+    return view('admin.employee.show', compact('employee'));
 }
 
 
@@ -78,42 +67,29 @@ class EmployeeController extends Controller
      */
     public function edit(string $id)
     {
-        $empCategories = empCategory::all();
+        $empCategories = EmpCategory::all();
         $positions = Position::all();
-        $employee = Employee::findOrFail($id);  // shu yerda bitta employee olamiz
+        $employee = Employee::findOrFail($id);
         return view('admin.employee.edit', compact('employee', 'positions', 'empCategories'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateEmployeeRequest $request, $id)
     {
-        $request->validate([
-            'name_uz' => 'required|string|max:255',
-            'name_ru' => 'required|string|max:255',
-            'email' => 'required|email',
-            'phone' => 'nullable|string|max:255',
-            'work_time' => 'nullable',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'category_id' => 'required|exists:emp_categories,id',
-            'position_id' => 'required|exists:positions,id',
-        ]);
-
         $employee = Employee::findOrFail($id);
-
-        $data = $request->only([
-            'name_uz', 'name_ru', 'email', 'phone', 'work_time', 'category_id', 'position_id'
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('admin/images'), $fileName);
+            $file->storeAs('public/employees', $fileName);
             $data['image'] = $fileName;
 
-            // eski rasmni o‘chirishni istasangiz shu yerga yozish mumkin
-            // unlink(public_path('admin/images/' . $employee->image));
+            if ($employee->image && $employee->image !== 'default.jpg') {
+                Storage::delete('public/employees/' . $employee->image);
+            }
         }
 
         $employee->update($data);
@@ -127,7 +103,14 @@ class EmployeeController extends Controller
      */
     public function destroy(string $id)
     {
-        Employee::destroy($id);
-        return redirect()->route('admin.employee.index');
+        $employee = Employee::findOrFail($id);
+        
+        if ($employee->image && $employee->image !== 'default.jpg') {
+            Storage::delete('public/employees/' . $employee->image);
+        }
+        
+        $employee->delete();
+        
+        return redirect()->route('admin.employee.index')->with('success', 'Employee deleted successfully!');
     }
 }

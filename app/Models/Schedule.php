@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Schudeli extends Model
+class Schedule extends Model
 {
+    protected $table = 'schudelis';
     protected $guarded = [];
     // Schudeli.php model
     public function smena() {
@@ -14,7 +15,7 @@ class Schudeli extends Model
     public function lesson() {
         return $this->belongsTo(Lesson::class, 'lesson_id', 'id');
     }
-   // App\Models\Schudeli.php
+   // App\Models\Schedule.php
 public function employee()
 {
     return $this->belongsTo(Employee::class);

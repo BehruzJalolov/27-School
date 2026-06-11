@@ -33,7 +33,7 @@
                     </div>
                     <div class="mb-4">
                         <label class="form-label">Image</label><br>
-                        <img src="{{ asset('admin/images/' . $post->image) }}" alt="Posts Image" style="width: 150px; height: auto; border-radius: 8px;">
+                        <img src="{{ asset('storage/posts/' . $post->image) }}" alt="Posts Image" style="width: 150px; height: auto; border-radius: 8px;">
                     </div>
 
                 </div>

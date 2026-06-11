@@ -3,14 +3,14 @@
 @section('content')
 
     <div class="col-md-8 offset-md-2">
-        <form action="{{ route('admin.category.update', $empCategory->id) }}" method="POST">
+        <form action="{{ route('admin.empCategory.update', $empCategory->id) }}" method="POST">
             @csrf
             @method('PUT')
 
             <div class="card">
                 <h5 class="card-header">Edit Category</h5>
                 <div class="card-body">
-                    <a href="{{ route('admin.category.index') }}" class="btn btn-success">Back</a>
+                    <a href="{{ route('admin.empCategory.index') }}" class="btn btn-success">Back</a>
 
                     <div class="mb-4">
                         <label for="name_uz" class="form-label">Name (uz)</label>

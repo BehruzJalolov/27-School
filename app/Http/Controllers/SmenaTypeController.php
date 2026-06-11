@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\empCategory;
 use App\Models\SmenaType;
 use Illuminate\Http\Request;
 
@@ -13,7 +12,7 @@ class SmenaTypeController extends Controller
      */
     public function index()
     {
-        $smenatypes = SmenaType::all();
+        $smenatypes = SmenaType::paginate(15);
         return view('admin.smenatype.index', compact('smenatypes'));
     }
 
@@ -35,7 +34,7 @@ class SmenaTypeController extends Controller
             'name_ru' =>  'required',
         ]);
         SmenaType::create($requestData);
-        return redirect()->route('admin.smenatype.index');
+        return redirect()->route('admin.smenatype.index')->with('success', 'Smena turi qo\'shildi!');
     }
 
     /**
@@ -78,6 +77,6 @@ class SmenaTypeController extends Controller
     public function destroy(string $id)
     {
         SmenaType::destroy($id);
-        return redirect()->route('admin.smenatype.index');
+        return redirect()->route('admin.smenatype.index')->with('success', 'Smena turi o\'chirildi!');
     }
 }

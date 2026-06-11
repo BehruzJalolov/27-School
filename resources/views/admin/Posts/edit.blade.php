@@ -52,7 +52,7 @@
                         <label for="image" class="form-label">Image</label>
                         @if($post->image)
                             <div class="mb-2">
-                                <img src="{{ asset('admin/images/' . $post->image) }}" alt="Posts Image" style="width: 150px; height: auto; border-radius: 8px;">
+                                <img src="{{ asset('storage/posts/' . $post->image) }}" alt="Posts Image" style="width: 150px; height: auto; border-radius: 8px;">
                             </div>
                         @endif
                         <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image">

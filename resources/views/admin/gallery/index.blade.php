@@ -54,10 +54,8 @@
                                 <tr>
                                     <th scope="row">{{ $gallery->id }}</th>
                                     <td>
-
-                                        <img src="/admin/images/{{$gallery->image}}" alt="" style="width: 60px; height: 60px;">
-
-                                    </td >
+                                        <img src="{{ asset('storage/gallery/' . $gallery->image) }}" alt="" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                                    </td>
                                     <td>{{ $gallery->title_uz }}</td>
                                     <td>{{ $gallery->title_ru }}</td>
                                     <td class="d-flex justify-content-center align-items-center">
@@ -76,6 +74,9 @@
 
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $gallerys->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
             </div>

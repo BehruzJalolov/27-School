@@ -10,7 +10,7 @@ class Lesson extends Model
     // App\Models\Lesson.php
     public function schudelis()
     {
-        return $this->hasMany(Schudeli::class, 'lesson_id', 'id');
+        return $this->hasMany(Schedule::class, 'lesson_id', 'id');
     }
 
 }

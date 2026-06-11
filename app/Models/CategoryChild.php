@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Categorychildren extends Model
+class CategoryChild extends Model
 {
+    protected $table = 'categorychildrens';
     protected $guarded = [];
     // CategoryChildren.php
 public function category()

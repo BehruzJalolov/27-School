@@ -23,7 +23,7 @@
                     </div>
                     <div class="mb-4">
                     <label class="form-label">Image</label><br>
-                    <img src="{{ asset('admin/images/' . $employee->image) }}" alt="Employee Image" style="width: 150px; height: auto; border-radius: 8px;">
+                    <img src="{{ asset('storage/employees/' . $employee->image) }}" alt="Employee Image" style="width: 150px; height: auto; border-radius: 8px;">
                 </div>
 
 
@@ -33,27 +33,15 @@
                     </div>
                     <div class="mb-4">
                     <div class="mb-4">
-                    <label for="category_id" class="form-label">Kategoriya (empCategory)</label>
-                    <select class="form-control" name="category_id" id="category_id" disabled>
-                        @foreach($empCategories as $category)
-                            <option value="{{ $category->id }}" {{ $employee->category_id == $category->id ? 'selected' : '' }}>
-                                {{ $category->name_uz }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                        <label for="category_id" class="form-label">Kategoriya (empCategory)</label>
+                        <input type="text" class="form-control" disabled value="{{ $employee->category->name_uz ?? '—' }}">
+                    </div>
 
                      </div>
                     <div class="mb-4">
-                    <label for="position_id" class="form-label">Lavozimi (Position)</label>
-                    <select class="form-control" name="position_id" id="position_id" disabled>
-                        @foreach($positions as $position)
-                            <option value="{{ $position->id }}" {{ $employee->position_id == $position->id ? 'selected' : '' }}>
-                                {{ $position->name_uz }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                        <label for="position_id" class="form-label">Lavozimi (Position)</label>
+                        <input type="text" class="form-control" disabled value="{{ $employee->position->name_uz ?? '—' }}">
+                    </div>
 
                     <div class="mb-4">
                         <label for="phone" class="form-label">Phone</label>

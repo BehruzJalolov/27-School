@@ -23,7 +23,7 @@
 
                     <div class="mb-3">
                         <label>Current Image</label><br>
-                        <img src="{{ asset('admin/images/' . $employee->image) }}" width="120" alt="current image">
+                        <img src="{{ asset('storage/employees/' . $employee->image) }}" width="120" alt="current image" style="border-radius: 8px;">
                     </div>
 
                     <div class="mb-3">

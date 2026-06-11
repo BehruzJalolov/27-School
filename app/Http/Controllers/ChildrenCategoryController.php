@@ -3,87 +3,65 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Categorychildren;
+use App\Models\CategoryChild;
 use Illuminate\Http\Request;
-use \App\Models\empCategory;
 
 class ChildrenCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-
-        $childrens = Categorychildren::with('category')->get();
+        $childrens = CategoryChild::with('category')->paginate(15);
         return view('admin.categorychildren.index', compact('childrens'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        $category = Category::all();
-        return view('admin.categorychildren.create',compact('category'));
+        $categories = Category::all();
+        return view('admin.categorychildren.create', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $requesData = $request -> validate([
-            'name_uz' => 'required',
-            'name_ru' => 'required',
-            'category_id' => 'required',
-            'url' => 'required',
-
+        $validated = $request->validate([
+            'name_uz'     => 'required|string|max:255',
+            'name_ru'     => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'url'         => 'required|string|max:255',
         ]);
-        Categorychildren::create($requesData);
-        return redirect() -> route('admin.categorychildren.index');
+
+        CategoryChild::create($validated);
+        return redirect()->route('admin.categorychildren.index')->with('success', 'Pastki kategoriya qo\'shildi!');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        $child = CategoryChild::with('category')->findOrFail($id);
+        return view('admin.categorychildren.show', compact('child'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-       $Category = Category::all();
-         $category = Categorychildren::findOrFail($id);
-         return view('admin.categorychildren.edit', compact('category','Category'));
+        $category   = CategoryChild::findOrFail($id);
+        $categories = Category::all();
+        return view('admin.categorychildren.edit', compact('category', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
-            'name_uz' => 'required|string|max:255',
-            'name_ru' => 'required|string|max:255',
+            'name_uz'     => 'required|string|max:255',
+            'name_ru'     => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'url' => 'required|string|max:255',
+            'url'         => 'required|string|max:255',
         ]);
-        $category = Categorychildren::findOrFail($id);
-        $category->update($validated);
-        return redirect()->route('admin.categorychildren.index')->with('success', 'Post yangilandi!');
+
+        CategoryChild::findOrFail($id)->update($validated);
+        return redirect()->route('admin.categorychildren.index')->with('success', 'Pastki kategoriya yangilandi!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        Categorychildren::destroy($id);
-        return redirect() -> route('admin.categorychildren.index');
+        CategoryChild::destroy($id);
+        return redirect()->route('admin.categorychildren.index')->with('success', 'Pastki kategoriya o\'chirildi!');
     }
 }

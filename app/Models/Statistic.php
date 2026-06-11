@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Statictik extends Model
+class Statistic extends Model
 {
+    protected $table = 'statictiks';
     protected $guarded=[];
 }

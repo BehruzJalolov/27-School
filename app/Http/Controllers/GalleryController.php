@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Gallery;
 use Illuminate\Http\Request;
-use \App\Models\HomePageImageTag;
+use App\Models\HomePageImageTag;
+use App\Http\Requests\StoreGalleryRequest;
+use App\Http\Requests\UpdateGalleryRequest;
+use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
@@ -13,8 +16,8 @@ class GalleryController extends Controller
      */
     public function index()
     {
-      $HomePageImageTag = HomePageImageTag::all();
-        $gallerys = Gallery::all();
+        $HomePageImageTag = HomePageImageTag::all();
+        $gallerys = Gallery::latest()->paginate(10);
         return view('admin.gallery.index',compact('gallerys','HomePageImageTag'));
     }
 
@@ -29,23 +32,22 @@ class GalleryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreGalleryRequest $request)
     {
-        $requestData = $request -> validate([
-            'title_uz' =>' required',
-            'title_ru' =>' required',
-
-        ]);
+        $requestData = $request->validated();
+        
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $imageName = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('admin/images/'), $imageName);
+            $file->storeAs('public/gallery', $imageName);
             $requestData['image'] = $imageName;
         }else {
-            $requestData['image'] = 'default.jpg'; // mavjud bo'lgan default rasm nomi
+            $requestData['image'] = 'default.jpg';
         }
+        
         Gallery::create($requestData);
-        return redirect() -> route('admin.gallery.index');
+        
+        return redirect()->route('admin.gallery.index')->with('success', 'Rasm qo\'shildi.');
     }
 
     /**
@@ -53,7 +55,8 @@ class GalleryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $gallery = Gallery::findOrFail($id);
+        return view('admin.gallery.show', compact('gallery'));
     }
 
     /**
@@ -61,15 +64,32 @@ class GalleryController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $gallery = Gallery::findOrFail($id);
+        return view('admin.gallery.edit', compact('gallery'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateGalleryRequest $request, string $id)
     {
-        //
+        $gallery = Gallery::findOrFail($id);
+        $requestData = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $imageName = time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/gallery', $imageName);
+            $requestData['image'] = $imageName;
+
+            if ($gallery->image && $gallery->image !== 'default.jpg') {
+                Storage::delete('public/gallery/' . $gallery->image);
+            }
+        }
+
+        $gallery->update($requestData);
+
+        return redirect()->route('admin.gallery.index')->with('success', 'Rasm yangilandi.');
     }
 
     /**
@@ -77,6 +97,14 @@ class GalleryController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $gallery = Gallery::findOrFail($id);
+        
+        if ($gallery->image && $gallery->image !== 'default.jpg') {
+            Storage::delete('public/gallery/' . $gallery->image);
+        }
+        
+        $gallery->delete();
+
+        return redirect()->route('admin.gallery.index')->with('success', 'Rasm o\'chirildi.');
     }
 }

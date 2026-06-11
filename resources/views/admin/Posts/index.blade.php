@@ -58,11 +58,8 @@
                                     <td>{{ $post->body_uz }}</td>
                                     <td>{{ $post->body_ru }}</td>
                                     <td>
-
-                                        <img src="{{ asset('admin/images/' . $post->image) }}" alt="" style="width: 60px; height: 60px;">
-
-
-                                    </td >
+                                        <img src="{{ asset('storage/posts/' . $post->image) }}" alt="" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                                    </td>
                                     <td class="d-flex justify-content-center align-items-center">
                                         <form action="{{ route('admin.posts.destroy', $post->id) }}" method = "POST" >
                                             @csrf
@@ -79,6 +76,9 @@
 
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $posts->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
             </div>

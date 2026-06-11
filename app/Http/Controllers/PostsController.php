@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
+use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
 {
@@ -27,7 +30,7 @@ class PostsController extends Controller
 
     public function index()
     {
-        $posts = Post::all();
+        $posts = Post::latest()->paginate(10);
 
         return view('admin.posts.index', compact('posts'));
     }
@@ -37,20 +40,14 @@ class PostsController extends Controller
         return view('admin.posts.create');
     }
 
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
-        $requestData = $request->validate([
-            'title_uz' => 'required|string|max:255',
-            'title_ru' => 'required|string|max:255',
-            'body_uz' => 'required|string',
-            'body_ru' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
+        $requestData = $request->validated();
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $imageName = time().'.'.$file->getClientOriginalExtension();
-            $file->move(public_path('admin/images/'), $imageName);
+            $file->storeAs('public/posts', $imageName);
             $requestData['image'] = $imageName;
         } else {
             $requestData['image'] = 'default.jpg';
@@ -58,7 +55,7 @@ class PostsController extends Controller
 
         Post::create($requestData);
 
-        return redirect()->route('admin.posts.index');
+        return redirect()->route('admin.posts.index')->with('success', 'Post yaratildi.');
     }
 
     public function show(Post $post)
@@ -71,21 +68,19 @@ class PostsController extends Controller
         return view('admin.posts.edit', compact('post'));
     }
 
-    public function update(Request $request, Post $post)
+    public function update(UpdatePostRequest $request, Post $post)
     {
-        $requestData = $request->validate([
-            'title_uz' => 'required|string|max:255',
-            'title_ru' => 'required|string|max:255',
-            'body_uz' => 'required|string',
-            'body_ru' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
+        $requestData = $request->validated();
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $imageName = time().'.'.$file->getClientOriginalExtension();
-            $file->move(public_path('admin/images/'), $imageName);
+            $file->storeAs('public/posts', $imageName);
             $requestData['image'] = $imageName;
+
+            if ($post->image && $post->image !== 'default.jpg') {
+                Storage::delete('public/posts/' . $post->image);
+            }
         }
 
         $post->update($requestData);
@@ -95,6 +90,9 @@ class PostsController extends Controller
 
     public function destroy(Post $post)
     {
+        if ($post->image && $post->image !== 'default.jpg') {
+            Storage::delete('public/posts/' . $post->image);
+        }
         $post->delete();
 
         return redirect()->route('admin.posts.index')->with('success', 'Post o\'chirildi.');
