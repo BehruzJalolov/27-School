@@ -67,9 +67,9 @@
                   </a>
               </li>
               <li class="menu-item">
-                  <a href="{{route('admin.statictik.index')}}" class="menu-link">
+                  <a href="{{route('admin.statistic.index')}}" class="menu-link">
                       <i class="menu-icon tf-icons bx bx-layout"></i>
-                      <div class="text-truncate" data-i18n="Layouts">Statictik</div>
+                      <div class="text-truncate" data-i18n="Layouts">Statistic</div>
                   </a>
               </li>
               <li class="menu-item">

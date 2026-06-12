@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Statistic extends Model
 {
-    protected $table = 'statictiks';
+    protected $table = 'statistics';
     protected $guarded=[];
 }

@@ -63,7 +63,7 @@ Route::prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/dashboard', fn () => view('admin.dashboard'))->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
         // CKEditor Upload
         Route::post('ckeditor/upload', [CKEditorController::class, 'upload'])
@@ -85,7 +85,7 @@ Route::prefix('admin')
             Route::resource('empCategory', EmpCategoryController::class);
             Route::resource('CategoryTop', CategoryTopController::class);
             Route::resource('posts', PostsController::class);
-            Route::resource('statictik', StatisticController::class);
+            Route::resource('statistic', StatisticController::class);
             Route::resource('infografika', InfographicController::class);
             Route::resource('usefulResource', UsefulResourceController::class);
             Route::resource('HomePageImageTag', HomePageImageTagController::class);

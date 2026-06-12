@@ -10,8 +10,8 @@
             <div class="row">
                 <div class="logoTextBox">
                     <div class="col-12">
-                                       @if(isset($HomePageImageTag))
-    @foreach($HomePageImageTag as $homePage)
+                                       @if(isset($imageTags))
+    @foreach($imageTags as $homePage)
         <div class="quote text-center">
             <h2>{!! __("message.school1") !!}</h2>
             <p>{{ $homePage['body_' . app()->getLocale()] }}</p>
@@ -68,10 +68,10 @@
             <!-- Service List End -->
 
             <!-- School Info Start -->
-            @if(isset($statictik) && count($statictik))
+            @if(isset($statistics) && count($statistics))
     <div class="row">
         <h1 class="text-center text-uppercase mt-5 title">{{ __('message.Maktab Haqida Qisqacha') }}</h1>
-        @foreach($statictik as $stat)
+        @foreach($statistics as $stat)
             <div class="col-lg-3 col-md-6">
                 <div class="school_info" data-tilt data-tilt-scale="1.1">
                     <h2>{{ $stat->classesCount }}</h2>

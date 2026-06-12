@@ -4,17 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\CategoryTop;
+use App\Models\CategoryChild;
 use App\Models\EmpCategory;
 use App\Models\Employee;
 use App\Models\Gallery;
 use App\Models\Infographic;
-use App\Models\Position;
 use App\Models\Post;
 use App\Models\Schedule;
 use App\Models\HomePageImageTag;
 use App\Models\SmenaType;
 use App\Models\Statistic;
 use App\Models\UsefulResource;
+use App\Services\FrontService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Message;
@@ -22,119 +23,110 @@ use Illuminate\Support\Facades\App;
 
 class FrontController extends Controller
 {
-    public function __construct()
+    protected $frontService;
+
+    public function __construct(FrontService $frontService)
     {
-        // Share common data to all views — loaded once, used everywhere
+        $this->frontService = $frontService;
+        
+        // Share common data to all views
         view()->share('categories', Category::all());
         view()->share('categoryTop', CategoryTop::all());
     }
 
+    /**
+     * Bosh sahifa
+     */
     public function index()
     {
-        $statistics  = Statistic::all();
-        $posts       = Post::latest()->take(6)->get();
-        $imageTags   = HomePageImageTag::all();
-        $schedule    = Schedule::with('smena')->get();
-        $categories  = Category::all();
-
-        return view('index', compact('statistics', 'posts', 'imageTags', 'schedule', 'categories'));
+        $data = $this->frontService->getHomePageData();
+        return view('index', $data);
     }
 
+    /**
+     * Maktab haqida ma'lumot
+     */
     public function schoolTack(Request $request)
     {
         $category = Category::with('children')->find($request->category);
         return view('frond.schoolTack', compact('category'));
     }
 
+    /**
+     * Rahbariyat sahifasi
+     */
     public function leaderShep()
     {
-        $teachers = Employee::with(['position', 'category'])
-            ->whereHas('category', fn ($q) => $q->where('name_uz', 'Rahbariyat'))
-            ->get();
-
+        $teachers = $this->frontService->getLeadershipEmployees();
         return view('frond.leaderShep', compact('teachers'));
     }
 
+    /**
+     * Rahbariyat batafsil
+     */
     public function LeaderShepDatail()
     {
-        $teachers = Employee::with(['position', 'category'])
-            ->whereHas('category', fn ($q) => $q->where('name_uz', 'Rahbariyat'))
-            ->get();
-
+        $teachers = $this->frontService->getLeadershipEmployees();
         return view('frond.LeaderShepDeatil', compact('teachers'));
     }
 
+    /**
+     * O'qituvchilar sahifasi
+     */
     public function teachers(Request $request)
     {
         $query = $request->input('query');
-
-        $teachersQuery = Employee::with(['position', 'category'])
-            ->whereHas('category', fn ($q) => $q->where('name_uz', '!=', 'Rahbariyat'));
-
-        if ($query) {
-            $teachersQuery->where(function ($q) use ($query) {
-                $q->where('name_uz', 'like', "%{$query}%")
-                  ->orWhere('name_ru', 'like', "%{$query}%")
-                  ->orWhereHas('category', fn ($cat) =>
-                      $cat->where('name_uz', 'like', "%{$query}%")
-                          ->orWhere('name_ru', 'like', "%{$query}%")
-                  );
-            });
-        }
-
-        $teachers = $teachersQuery->get()
-            ->groupBy(fn ($item) => $item->category
-                ? $item->category['name_' . App::getLocale()]
-                : 'Boshqa toifa'
-            );
-
+        $teachers = $this->frontService->getTeachers($query);
         return view('frond.teachers', compact('teachers', 'query'));
     }
 
+    /**
+     * Rekvizitlar
+     */
     public function rekvizit()
     {
         return view('frond.rekvizit');
     }
 
+    /**
+     * Yangiliklar ro'yxati
+     */
     public function schoolNews()
     {
-        $posts = Post::latest()->take(6)->get();
+        $posts = $this->frontService->getLatestPosts(6);
         return view('frond.schoolNews', compact('posts'));
     }
 
+    /**
+     * Yangilik batafsil
+     */
     public function newsDetail($id)
     {
         $post = Post::findOrFail($id);
         return view('frond.newsDetail', compact('post'));
     }
 
+    /**
+     * Yangiliklarni qidirish
+     */
     public function searchPosts(Request $request)
     {
         $query = $request->input('query');
-
-        $posts = Post::when($query, function ($q) use ($query) {
-            $q->where('title_uz', 'like', "%{$query}%")
-              ->orWhere('title_ru', 'like', "%{$query}%")
-              ->orWhere('body_uz', 'like', "%{$query}%")
-              ->orWhere('body_ru', 'like', "%{$query}%");
-        })->get();
-
+        $posts = $this->frontService->searchPosts($query);
         return view('frond.schoolNews', compact('posts', 'query'));
     }
 
+    /**
+     * Dars jadvali (ta'lim)
+     */
     public function education(Request $request)
     {
         $query      = $request->input('query');
         $categoryId = $request->input('category');
 
-        $educations = Schedule::query()
-            ->when($query, fn ($q) => $q->where('week_day', 'like', "%{$query}%"))
-            ->when($categoryId, fn ($q) => $q->where('category_id', $categoryId))
-            ->get();
-
-        $smenaType = SmenaType::all();
-
-        return view('frond.education', compact('educations', 'smenaType'));
+        $data = $this->frontService->getEducationData($query, $categoryId);
+        
+        return view('frond.education', $data);
     }
 
     public function educationDetail($id)
@@ -153,16 +145,18 @@ class FrontController extends Controller
     public function educationSearch(Request $request)
     {
         $query = $request->input('query');
-
-        $educations = Schedule::when($query, fn ($q) => $q->where('week_day', 'like', "%{$query}%"))->get();
-        $smenaType  = SmenaType::all();
-
-        return view('frond.education', compact('educations', 'smenaType', 'query'));
+        
+        $data = $this->frontService->getEducationData($query);
+        
+        return view('frond.education', $data + ['query' => $query]);
     }
 
+    /**
+     * Foydali resurslar
+     */
     public function usefulresurs()
     {
-        $usefulresource = UsefulResource::all();
+        $usefulresource = $this->frontService->getUsefulResources();
         return view('frond.usefulResurs', compact('usefulresource'));
     }
 
@@ -172,23 +166,35 @@ class FrontController extends Controller
         return view('frond.usefulresoursedetail', compact('resource'));
     }
 
+    /**
+     * Galereya
+     */
     public function Gallery()
     {
-        $gallery = Gallery::all();
+        $gallery = $this->frontService->getGallery();
         return view('frond.gallery', compact('gallery'));
     }
 
+    /**
+     * Infografika
+     */
     public function infoGrafika()
     {
-        $infografika = Infographic::all();
+        $infografika = $this->frontService->getInfographics();
         return view('frond.infoGrafika', compact('infografika'));
     }
 
+    /**
+     * Bog'lanish
+     */
     public function connect()
     {
         return view('frond.connect');
     }
 
+    /**
+     * Email yuborish
+     */
     public function SendEmail(Request $request)
     {
         $data = $request->validate([
