@@ -20,7 +20,7 @@ class UserController extends Controller
     public function __construct(
         private readonly OtpService $otpService,
     ) {
-        $this->authorizeResource(User::class, 'user');
+        // $this->authorizeResource(User::class, 'user');
     }
 
     public function index(Request $request): View

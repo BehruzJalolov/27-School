@@ -21,6 +21,14 @@ use App\Http\Controllers\LessonController;
 use App\Http\Controllers\CKEditorController;
 use App\Http\Controllers\Admin\UserController;
 
+
+
+
+Route::get('/dashboard', function () {
+    return redirect()->route('index');
+})->middleware('auth')->name('dashboard');
+
+
 // ----------------------------
 // Language Switch
 // ----------------------------

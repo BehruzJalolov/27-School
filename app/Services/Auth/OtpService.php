@@ -2,13 +2,17 @@
 
 namespace App\Services\Auth;
 
-use App\Jobs\SendSmsJob;
+use App\Contracts\SmsGateway;
 use App\Models\PhoneVerification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 
 class OtpService
 {
+    public function __construct(
+        private readonly SmsGateway $smsGateway,
+    ) {}
+
     public function normalizePhone(string $phone): string
     {
         $digits = preg_replace('/\D+/', '', $phone);
@@ -59,7 +63,8 @@ class OtpService
 
         $message = "Maktab tizimi: tasdiqlash kodi {$code}. Kod 5 daqiqa amal qiladi.";
 
-        SendSmsJob::dispatch($phone, $message);
+        // To'g'ridan-to'g'ri SMS yuborish (queue ishlatmaymiz)
+        $this->smsGateway->send($phone, $message);
     }
 
     public function verify(string $phone, string $code, string $purpose): PhoneVerification

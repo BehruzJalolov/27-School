@@ -3,15 +3,9 @@
 namespace App\Jobs;
 
 use App\Contracts\SmsGateway;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Queue\Queueable;
 
-class SendSmsJob implements ShouldQueue
+class SendSmsJob
 {
-    use Queueable;
-
-    public int $tries = 3;
-
     public function __construct(
         public string $phone,
         public string $message,
